@@ -1,0 +1,31 @@
+The goal is to produce a general purpose external sort framework. The overall approach is conventional: produce sorted runs and merge them as needed to produce the final output. Input is provided by calling a method with the key and payload; output is delivered to a user-provided function.
+
+The key is simply a variable-length byte string; the caller is responsible for key encoding.
+
+Tuning knobs:
+
+* run size
+* number of threads
+* max merge width
+* max FDs in use
+
+Data Structures
+
+For run creation:
+
+* key pointer vector (pointers)
+* keys: payload offset, key length, key data
+* payload: payload length, payload data
+
+keyptr  store(const void* key, unsigned int keyLength,
+              const void* payload, unsigned int payloadLength);
+
+max key ptr vector length based on space needed for keys and payload, assuming just 1 byte for each.
+
+Known per run prior to starting sort:
+
+* min/max key length
+* min/max payload length
+* min/max sort record length (key + payload + 2 length fields)
+* number of records in run
+
