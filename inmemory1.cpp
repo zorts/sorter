@@ -86,15 +86,9 @@ namespace {
     }
   };
 
-  class Uint32StringInMemoryTest : public InMemoryTest<uint32_t, std::string> {
+  template <typename KT>
+  class WhateverStringInMemoryTest : public InMemoryTest<KT, std::string> {
   protected:
-    virtual std::string prepareKey(const uint32_t& key)
-    {
-      char buffer[4];
-      ::external_sort::uint32ToKey(key, buffer);
-      return std::string(buffer, 4);
-    }
-
     virtual std::string preparePayload(const std::string& payload)
     {
       return payload;
@@ -106,6 +100,15 @@ namespace {
     }
   };
 
+  class Uint32StringInMemoryTest: public WhateverStringInMemoryTest<uint32_t> {
+    virtual std::string prepareKey(const uint32_t& key)
+    {
+      char buffer[4];
+      ::external_sort::uint32ToKey(key, buffer);
+      return std::string(buffer, 4);
+    }
+  };
+
   TEST_F(Uint32StringInMemoryTest, Basic)
   {
     using namespace std;
@@ -114,6 +117,68 @@ namespace {
     push_back(1, "one");
     push_back(0, "zero");
     push_back(3, "three 2");
+    sortAndCheck();
+  }
+
+  class Int32StringInMemoryTest: public WhateverStringInMemoryTest<int32_t> {
+    virtual std::string prepareKey(const int32_t& key)
+    {
+      char buffer[4];
+      ::external_sort::int32ToKey(key, buffer);
+      return std::string(buffer, 4);
+    }
+  };
+
+  TEST_F(Int32StringInMemoryTest, Basic)
+  {
+    using namespace std;
+    push_back(3, "three 1");
+    push_back(2, "two");
+    push_back(1, "one");
+    push_back(0, "zero");
+    push_back(3, "three 2");
+    push_back(-1, "minus one");
+    sortAndCheck();
+  }
+
+  class DoubleStringInMemoryTest : public WhateverStringInMemoryTest<double> {
+  protected:
+    virtual std::string prepareKey(const double& key)
+    {
+      char buffer[8];
+      ::external_sort::doubleToKey(key, buffer);
+      return std::string(buffer, 8);
+    }
+  };
+
+  TEST_F(DoubleStringInMemoryTest, Basic)
+  {
+    using namespace std;
+    push_back(3.0, "three point oh");
+    push_back(2, "two");
+    push_back(1, "one");
+    push_back(0, "zero");
+    push_back(3, "three point oh 2");
+    push_back(-1, "minus one");
+    sortAndCheck();
+  }
+
+  class StringStringInMemoryTest : public WhateverStringInMemoryTest<std::string> {
+  protected:
+    virtual std::string prepareKey(const std::string& key)
+    {
+      return key;
+    }
+  };
+
+  TEST_F(StringStringInMemoryTest, Basic)
+  {
+    using namespace std;
+    push_back("a", "letter a");
+    push_back("aa", "letters aa");
+    push_back("b", "letter b");
+    push_back("z", "letter z");
+    push_back("c", "letter c");
     sortAndCheck();
   }
 }
