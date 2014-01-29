@@ -20,15 +20,17 @@ int main(int argc, const char* const argv[])
   using namespace std;
   typedef pair<unsigned int, string> KeyValue;
   vector<KeyValue> source;
-  source.push_back({3, "three"});
+  source.push_back({3, "three 1"});
   source.push_back({2, "two"});
   source.push_back({1, "one"});
   source.push_back({0, "zero"});
+  source.push_back({3, "three 2"});
 
   PrintStringSortResults receiver;
   external_sort::Sorter sorter;
   sorter
     .withReceiver(&receiver)
+    .stable()
     .create();
 
   for (auto kv: source) 
