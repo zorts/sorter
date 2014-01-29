@@ -4,6 +4,20 @@
 
 namespace external_sort {
 
+  class NotYetSupportedException : public SorterException {
+  public:
+    NotYetSupportedException(const char* what)
+      : _what(what) {}
+    ~NotYetSupportedException() noexcept {}
+    // default copy/assign OK
+    virtual const char* what() const noexcept 
+    {
+      return _what.c_str();
+    }
+  private:
+    std::string _what;
+  };
+
   SorterImpl::SorterImpl(unsigned int runSize, bool stable, Receiver* receiver)
     : _receiver(receiver)
     , _runSize(runSize)
@@ -33,7 +47,6 @@ namespace external_sort {
     }
     else
     {
-      // TBD: 
       addToRunQueue(_currentRunState);
       _currentRunState.reset();
       awaitMergeCompletion();
@@ -50,11 +63,13 @@ namespace external_sort {
   {
     _firstRun = false;
     // TBD
+    throw new NotYetSupportedException("addToRunQueue called");
   }
 
   void SorterImpl::awaitMergeCompletion()
   {
     // TBD
+    throw new NotYetSupportedException("awaitMergeCompletion called");
   }
 
 }

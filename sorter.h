@@ -15,7 +15,6 @@ namespace external_sort {
     {
       return "The sorter was not created (by calling create()).";
     }
-
   };
 
   class SorterCreatedMoreThanOnceException : public SorterException {
