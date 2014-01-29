@@ -5,22 +5,23 @@ The key is simply a variable-length byte string; the caller is responsible for k
 Tuning knobs:
 
 * run size
+* max number of in-memory runs
 * number of threads
 * max merge width
 * max FDs in use
 
 Data Structures
 
-For run creation:
+In-memory runs:
 
-* key pointer vector (pointers)
-* keys: payload offset, key length, key data
+* keys: key length, key data and payload offset
 * payload: payload length, payload data
+* key pointer vector: pointers
 
-keyptr  store(const void* key, unsigned int keyLength,
-              const void* payload, unsigned int payloadLength);
+The keys and payload are stored in a fixed-size "run blocks" of storage, keys filling the blocks bottom-up and payload top-down. When a key/payload pair won't fit, the block is full and read to be sorted. In addition, there is a vector of pointers into the keys; it's these pointers that are actually sorted.
 
-max key ptr vector length based on space needed for keys and payload, assuming just 1 byte for each.
+The size of the run blocks is tunable, but largish: 64MB is the default. The worst-case key pointer vector length is determined by key and payload overhead and minimum key/payload sizes to about 4M, which (for 64-bit pointers) is 32MB. Presumably most key/payload combinations will be significantly longer, so the initial vector capacity is set to 1M.
+
 
 Known per run prior to starting sort:
 
