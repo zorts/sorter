@@ -1,4 +1,8 @@
 // -*- mode: c++ -*-
+
+// Copyright (c) 2014 by Jerry L. Callen. See the LICENSE file
+// for the detailed license.
+
 #ifndef EXTERNAL_SORT_KEYCONVERT_H
 #define EXTERNAL_SORT_KEYCONVERT_H
 

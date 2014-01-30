@@ -1,1 +1,4 @@
 This project is a simple external (disk-based) sort class for C++.
+
+Copyright (c) 2014 by Jerry L. Callen. See the LICENSE file
+for the detailed license.

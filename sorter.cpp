@@ -1,5 +1,8 @@
 // -*- mode: c++ -*-
 
+// Copyright (c) 2014 by Jerry L. Callen. See the LICENSE file
+// for the detailed license.
+
 #include "sorterimpl.h"
 
 namespace external_sort {

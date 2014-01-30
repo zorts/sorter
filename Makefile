@@ -1,3 +1,6 @@
+# Copyright (c) 2014 by Jerry L. Callen. See the LICENSE file
+# for the detailed license.
+
 CXXFLAGS = -std=c++0x -g -pthread
 SORTOBJS = sorter.o sorterimpl.o
 LINKFLAGS = -L. -lsort -lpthread
@@ -15,7 +18,7 @@ sorter.o: sorter.h sorterimpl.h
 sorterimpl.o: sorter.h sorterimpl.h runstate.h
 
 clean:
-	@rm -f *.o driver
+	@rm -f *.o $(ALLTESTS) *.a
 
 veryclean: clean
 	@rm -f *~

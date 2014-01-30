@@ -1,3 +1,5 @@
+Copyright (c) 2014 by Jerry L. Callen. See the LICENSE file for the detailed license.
+
 The goal is to produce a general purpose external sort framework. The overall approach is conventional: produce sorted runs and merge them as needed to produce the final output. Input is provided by calling a method with the key and payload; output is delivered to a user-provided function.
 
 The key is simply a variable-length byte string; the caller is responsible for key encoding.
