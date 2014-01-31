@@ -33,7 +33,7 @@ namespace external_sort {
     if (_fd != -1)
     {
       // TBD: real error handling
-      SORTER_ASSERT(0 == ::close(_fd));
+      SORT_ASSERT(0 == ::close(_fd));
       _fd = -1;
     }
   }
@@ -59,7 +59,7 @@ namespace external_sort {
       ;
     std::string nameTemplate = s.str();
     result->_fd = ::mkstemp(const_cast<char*>(nameTemplate.data()));
-    SORTER_ASSERT(result->_fd);
+    SORT_ASSERT(result->_fd);
     return result;
   }
 
@@ -78,16 +78,16 @@ namespace external_sort {
     _writeVector[2].iov_len = (size_t) payloadLength;
     ssize_t written = ::writev(_fd, _writeVector, 3);
     // TBD: real exceptions
-    SORTER_ASSERT(written == (ssize_t) _header._keyPlusPayloadLength + sizeof(Header));
+    SORT_ASSERT(written == (ssize_t) _header._keyPlusPayloadLength + sizeof(Header));
   }
 
   void DiskRun::resetForRead()
   {
-    SORTER_ASSERT(_writing);
+    SORT_ASSERT(_writing);
     _writing = false;
     off_t where = ::lseek(_fd, 0, SEEK_SET);
     // TBD: real exception
-    SORTER_ASSERT(((off_t)0) == where);
+    SORT_ASSERT(((off_t)0) == where);
     _buffer = new char[_maxRecordSize];
   }
 
@@ -98,7 +98,7 @@ namespace external_sort {
 
   bool DiskRun::next()
   {
-    SORTER_ASSERT_DEBUGONLY(!_writing);
+    SORT_ASSERT_DEBUGONLY(!_writing);
     ssize_t amountRead = read(_fd, &_header, sizeof(Header));
     if (amountRead == sizeof(Header))
     {
@@ -109,26 +109,26 @@ namespace external_sort {
         return true;
       }
       // TBD
-      SORTER_ASSERT(amountRead == dataLength);
+      SORT_ASSERT(amountRead == dataLength);
     }
 
     // TBD
-    SORTER_ASSERT(amountRead == 0); // EOF
+    SORT_ASSERT(amountRead == 0); // EOF
     close();
     return false;
   }
 
   DiskRun::Item DiskRun::getKey() const
   {
-    SORTER_ASSERT_DEBUGONLY(!_writing);
-    SORTER_ASSERT_DEBUGONLY(_fd != -1);
+    SORT_ASSERT_DEBUGONLY(!_writing);
+    SORT_ASSERT_DEBUGONLY(_fd != -1);
     return Item(_buffer, _header._keyLength);
   }
 
   DiskRun::Item DiskRun::getPayload() const
   {
-    SORTER_ASSERT_DEBUGONLY(!_writing);
-    SORTER_ASSERT_DEBUGONLY(_fd != -1);
+    SORT_ASSERT_DEBUGONLY(!_writing);
+    SORT_ASSERT_DEBUGONLY(_fd != -1);
     return Item(_buffer+_header._keyLength, _header._keyPlusPayloadLength - _header._keyLength);
   }
 

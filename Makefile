@@ -5,7 +5,7 @@ CXXFLAGS = -std=c++0x -g -pthread
 SORTOBJS = sorter.o sorterimpl.o diskrun.o
 LINKFLAGS = -L. -lsort -lpthread
 
-ALLTESTS = inmemory1
+ALLTESTS = inmemory1 assert1
 
 .PHONY: alltests
 alltests: $(ALLTESTS)
@@ -32,4 +32,9 @@ GTEST_LINKFLAGS = $(LINKFLAGS) -L$(GTEST_DIR)/build -lgtest_main -lgtest
 inmemory1: inmemory1.o libsort.a
 	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
 inmemory1.o: inmemory1.cpp sorter.h
+	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 
+
+assert1: assert1.o libsort.a
+	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
+assert1.o: assert1.cpp sortassert.h
 	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 

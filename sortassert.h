@@ -6,7 +6,6 @@
 #ifndef EXTERNAL_SORT_SORTASSERT_H
 #define EXTERNAL_SORT_SORTASSERT_H
 
-#include <vector>
 #include <sstream>
 #include <stdexcept>
 
@@ -28,7 +27,7 @@ namespace external_sort {
     }
   };  
 
-#define SORTER_ASSERT(expr)                                     \
+#define SORT_ASSERT(expr)                                       \
   do {                                                          \
     if (!(expr))                                                \
     {                                                           \
@@ -38,10 +37,10 @@ namespace external_sort {
 
 // Assume that we are debugging if not compiling optimized.a
 #ifndef __OPTIMIZE__
-#define SORTER_ASSERT_DEBUGONLY(expr) \
-        SORTER_ASSERT(expr)
+#define SORT_ASSERT_DEBUGONLY(expr) \
+        SORT_ASSERT(expr)
 #else
-#define SORTER_ASSERT_DEBUGONLY(expr) 
+#define SORT_ASSERT_DEBUGONLY(expr) 
 #endif
 
 } // namespace external_sort
