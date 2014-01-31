@@ -2,7 +2,7 @@
 # for the detailed license.
 
 CXXFLAGS = -std=c++0x -g -pthread
-SORTOBJS = sorter.o sorterimpl.o
+SORTOBJS = sorter.o sorterimpl.o diskrun.o
 LINKFLAGS = -L. -lsort -lpthread
 
 ALLTESTS = inmemory1
@@ -16,6 +16,7 @@ libsort.a: $(SORTOBJS)
 
 sorter.o: sorter.h sorterimpl.h
 sorterimpl.o: sorter.h sorterimpl.h runstate.h
+diskrun.o: diskrun.h sortassert.h
 
 clean:
 	@rm -f *.o $(ALLTESTS) *.a

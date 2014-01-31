@@ -30,7 +30,7 @@ namespace external_sort {
     }
   };
 
-  class SorterNoReceiverException : public SorterException {
+  class NoReceiverException : public SorterException {
   public:
     // default ctor/dtor/copy/assign OK
     virtual const char* what() const noexcept 
@@ -39,11 +39,11 @@ namespace external_sort {
     }
   };
 
-  class SorterRecordSizeException : public SorterException {
+  class RecordSizeException : public SorterException {
   public:
-    SorterRecordSizeException(unsigned int keyLength, 
-                              unsigned int payloadLength,
-                              unsigned int runBlockSize)
+    RecordSizeException(unsigned int keyLength, 
+                        unsigned int payloadLength,
+                        unsigned int runBlockSize)
       : _keyLength(keyLength)
       , _payloadLength(payloadLength)
       , _runBlockSize(runBlockSize) {}

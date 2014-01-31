@@ -194,7 +194,7 @@ namespace external_sort {
         //      allowing expansion for huge records?
         if (spaceNeededFor(keyLength, payloadLength) > _size)
         {
-          throw new SorterRecordSizeException(keyLength, payloadLength, _size);
+          throw new RecordSizeException(keyLength, payloadLength, _size);
         }
         return KeyPointer(nullptr);
       }
@@ -223,11 +223,13 @@ namespace external_sort {
       , _stable(stable)
     {
       // This initial capacity is based on the overhead for a key/payload pair 
-      // (12 bytes) + key/payload pair size of 20 bytes (entirely arbitrary...).
+      // key/payload pair size of 20 bytes (entirely arbitrary...).
       // It might be reasonable to compute an average for the first run and use 
       // that for subsequent runs.
-      const unsigned int PER_PAIR_STORAGE = sizeof(KeyItem);
-      
+      unsigned int bytesPerRecord = RunBlock::spaceNeededFor(8, 12);
+      unsigned int keyPointerVectorLength = runBlockSize/bytesPerRecord;
+      _keyVector.reserve(keyPointerVectorLength);
+      clear();
     }
     // default dtor OK
 
@@ -239,11 +241,24 @@ namespace external_sort {
       if (p)
       {
         _keyVector.push_back(p);
+        ++ _records;
+        _keySize += keyLength;
+        _payloadSize += payloadLength;
+        unsigned int recordSize = keyLength + payloadLength;
+        if (recordSize > _maxRecordSize)
+        {
+          _maxRecordSize = recordSize;
+        }
       }
       return (bool) p;
     }
 
-    void sort()
+    // I want the sort mechanism to be improvable (using, for instance,
+    // microruns that fit into cache followed by a merge) without changing
+    // the upper layers. So - sort with direct output and sort with diskrun
+    // creation are all in this layer.
+
+    void sort(Receiver* receiver)
     {
       if (_stable)
       {
@@ -253,22 +268,23 @@ namespace external_sort {
       {
         std::sort(_keyVector.begin(), _keyVector.end());
       }
+
+      const char* blockBase = _runBlock.data();
+      for (auto keyPointer: _keyVector)
+      {
+        const PayloadItem* item = keyPointer.payload(blockBase);
+        receiver->receive(item->payloadData(), item->_payloadLength);
+      }
     }
 
     void clear()
     {
       _keyVector.resize(0);
       _runBlock.clear();
-    }
-
-    const KeyVector& keyVector() const
-    {
-      return _keyVector;
-    }
-
-    const RunBlock& runBlock() const
-    {
-      return _runBlock;
+      _records = 0;
+      _keySize = 0;
+      _payloadSize = 0;
+      _maxRecordSize = 0;
     }
 
   private:
@@ -279,6 +295,12 @@ namespace external_sort {
     KeyVector _keyVector;
     RunBlock _runBlock;
     bool _stable;
+
+    // per-run statistics
+    unsigned int _records;
+    unsigned int _keySize;
+    unsigned int _payloadSize;
+    unsigned int _maxRecordSize;
   };
   typedef std::shared_ptr<RunState> RunStateSPtr;
 

@@ -40,13 +40,7 @@ namespace external_sort {
     if (_firstRun)
     {
       // No merges are required
-      _currentRunState->sort();
-      const char* blockBase = _currentRunState->runBlock().data();
-      for (auto keyPointer: _currentRunState->keyVector())
-      {
-        const PayloadItem* item = keyPointer.payload(blockBase);
-        _receiver->receive(item->payloadData(), item->_payloadLength);
-      }
+      _currentRunState->sort(_receiver);
     }
     else
     {

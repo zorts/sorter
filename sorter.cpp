@@ -51,7 +51,7 @@ namespace external_sort {
     }
     if (!_receiver)
     {
-      throw new SorterNoReceiverException();
+      throw new NoReceiverException();
     }
     _impl = new SorterImpl(_runSize, _stable, _receiver);
   }
