@@ -6,16 +6,20 @@
 #ifndef EXTERNAL_SORT_DISKRUN_H
 #define EXTERNAL_SORT_DISKRUN_H
 
+#include <memory>
 #include <sys/uio.h> // for iovec
 
 namespace external_sort {
 
+  class DiskRun;
+  typedef std::shared_ptr<DiskRun> DiskRunSPtr;
+
   class DiskRun {
   public:
     ~DiskRun();
-    static DiskRun* getDiskRun(unsigned int level, 
-                               unsigned int keyBytes,
-                               unsigned int payloadBytes);
+    static DiskRunSPtr getDiskRun(unsigned int level, 
+                                  unsigned int keyBytes,
+                                  unsigned int payloadBytes);
 
     void write(const void* key, unsigned int keyLength,
                const void* payload, unsigned int payloadLength);
@@ -48,7 +52,7 @@ namespace external_sort {
     };
 
     // Linux implementation
-    char* _buffer;
+    std::unique_ptr<char> _buffer;
     iovec _writeVector[3];
     Header _header;
     int _fd;

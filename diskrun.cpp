@@ -19,8 +19,7 @@ namespace external_sort {
   unsigned int DiskRun::_seq = 0;
 
   DiskRun::DiskRun()
-    : _buffer(0)
-    , _fd(-1)
+    : _fd(-1)
     , _maxRecordSize(0)
     , _writing(true)
   {
@@ -41,15 +40,13 @@ namespace external_sort {
   DiskRun::~DiskRun()
   {
     close();
-    delete _buffer;
-    _buffer = 0;
   }
 
-  DiskRun* DiskRun::getDiskRun(unsigned int level, 
-                               unsigned int keyBytes,
-                               unsigned int payloadBytes)
+  DiskRunSPtr DiskRun::getDiskRun(unsigned int level, 
+                                  unsigned int keyBytes,
+                                  unsigned int payloadBytes)
   {
-    DiskRun* result = new DiskRun;
+    DiskRunSPtr result(new DiskRun);
     // TBD
     std::ostringstream s;
     s << "sort_level_" << level
@@ -60,6 +57,9 @@ namespace external_sort {
     std::string nameTemplate = s.str();
     result->_fd = ::mkstemp(const_cast<char*>(nameTemplate.data()));
     SORT_ASSERT(result->_fd);
+    // immediately unlink so we don't have to worry about cleanup
+    SORT_ASSERT(0 == unlink(const_cast<char*>(nameTemplate.data())));
+
     return result;
   }
 
@@ -88,7 +88,7 @@ namespace external_sort {
     off_t where = ::lseek(_fd, 0, SEEK_SET);
     // TBD: real exception
     SORT_ASSERT(((off_t)0) == where);
-    _buffer = new char[_maxRecordSize];
+    _buffer.reset(new char[_maxRecordSize]);
   }
 
   struct Item {
@@ -103,7 +103,7 @@ namespace external_sort {
     if (amountRead == sizeof(Header))
     {
       ssize_t dataLength = (size_t) (_header._keyPlusPayloadLength);
-      amountRead = read(_fd, _buffer, dataLength);
+      amountRead = read(_fd, _buffer.get(), dataLength);
       if (amountRead == dataLength)
       {
         return true;
@@ -122,14 +122,14 @@ namespace external_sort {
   {
     SORT_ASSERT_DEBUGONLY(!_writing);
     SORT_ASSERT_DEBUGONLY(_fd != -1);
-    return Item(_buffer, _header._keyLength);
+    return Item(_buffer.get(), _header._keyLength);
   }
 
   DiskRun::Item DiskRun::getPayload() const
   {
     SORT_ASSERT_DEBUGONLY(!_writing);
     SORT_ASSERT_DEBUGONLY(_fd != -1);
-    return Item(_buffer+_header._keyLength, _header._keyPlusPayloadLength - _header._keyLength);
+    return Item(_buffer.get()+_header._keyLength, _header._keyPlusPayloadLength - _header._keyLength);
   }
 
 } // namespace external_sort
