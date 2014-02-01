@@ -7,7 +7,7 @@ LINKFLAGS = -L. -lsort -lpthread
 
 ALLTESTS = assert1 diskrun1 runstate1
 
-.PHONY: alltests
+.PHONY: alltests stats
 alltests: $(ALLTESTS)
 	result=0; for test in $(ALLTESTS);  do ./$$test; result=$$(($$result+$$?));  done; exit $$result
 
@@ -23,6 +23,9 @@ clean:
 
 veryclean: clean
 	@rm -f *~
+
+stats:
+	cloc *.h *.cpp Makefile
 
 GTEST_DIR= ../gtest
 GTEST_INC = -I$(GTEST_DIR)/include
