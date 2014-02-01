@@ -19,7 +19,7 @@ sorterimpl.o: sorter.h sorterimpl.h runstate.h
 diskrun.o: diskrun.h sortassert.h
 
 clean:
-	@rm -f *.o $(ALLTESTS) *.a
+	@rm -f *.o $(ALLTESTS) *.a timingrunsort
 
 veryclean: clean
 	@rm -f *~
