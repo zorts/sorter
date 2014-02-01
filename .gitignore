@@ -2,6 +2,7 @@ assert1
 diskrun1
 inmemory1
 runstate1
+timingrunsort
 *.o
 *.a
 *~

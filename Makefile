@@ -47,6 +47,14 @@ runstate1: runstate1.o libsort.a
 runstate1.o: runstate1.cpp sorter.h
 	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 
 
+timingrunsort: timingrunsort.o libsort.a
+	$(CXX) $^ $(LINKFLAGS) -o $@
+timingrunsort.o: timingrunsort.cpp runstate.h sorter.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $< 
+
+runtiming: timingrunsort
+	./timingrunsort
+
 # Not currently made
 inmemory1: inmemory1.o libsort.a
 	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@

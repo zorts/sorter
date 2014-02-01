@@ -24,7 +24,6 @@ The keys and payload are stored in a fixed-size "run blocks" of storage, keys fi
 
 The size of the run blocks is tunable, but largish: 64MB is the default. The worst-case key pointer vector length is determined by key and payload overhead and minimum key/payload sizes to about 4M, which (for 64-bit pointers) is 32MB. Presumably most key/payload combinations will be significantly longer, so the initial vector capacity is set to 1M.
 
-
 Known per run prior to starting sort:
 
 * min/max key length
@@ -32,3 +31,30 @@ Known per run prior to starting sort:
 * min/max sort record length (key + payload + 2 length fields)
 * number of records in run
 
+=============
+
+In-memory sort issues
+
+A simple timing experiment illustrates the effects of startup overhead, cache effects and algorithm on the sort:
+
+  records | time (stable)
+        1 | 1410 nanoseconds/record
+       10 | 415 nanoseconds/record
+      100 | 482 nanoseconds/record
+     1000 | 1476.2 nanoseconds/record
+    10000 | 1049.76 nanoseconds/record
+   100000 | 919.127 nanoseconds/record
+  1000000 | 1059.18 nanoseconds/record
+
+  records | time (not stable)
+        1 | 320 nanoseconds/record
+       10 | 281 nanoseconds/record
+      100 | 1268 nanoseconds/record
+     1000 | 4172.7 nanoseconds/record
+    10000 | 3477.14 nanoseconds/record
+   100000 | 4002.28 nanoseconds/record
+  1000000 | 4476.87 nanoseconds/record
+
+NOTE: These runs were made in a VM, and NOT of a carefully quiesced system, so there there was significant run-to-run variability in the smallest record counts. Nonetheless this pattern was consistent.
+
+I don't know yet how the STL sorts are implemented in this version of the library (libg++ 4.6.3), but the general presumption is that the stable sort is a merge sort and the not stable sort is Quicksort. Merge sort generally requires additional lookaside memory, so I expected the larger start-up time. However, the stable sort rapidly overtakes the not stable sort! Perhaps the merge sort is already taking advantage of "microruns" for locality?
