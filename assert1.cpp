@@ -9,9 +9,13 @@
 namespace {
   using namespace external_sort;
 
-  TEST(Assertions, Basic)
+  TEST(Assertions, Pass)
   {
-    EXPECT_ANY_THROW({SORT_ASSERT(0 == 1);});
-    EXPECT_NO_THROW({SORT_ASSERT(1 == 1);});
+    ASSERT_NO_THROW({SORT_ASSERT(1 == 1);});
+  }
+
+  TEST(Assertions, Fail)
+  {
+    ASSERT_ANY_THROW({SORT_ASSERT(0 == 1);});
   }
 }

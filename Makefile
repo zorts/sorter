@@ -9,7 +9,7 @@ ALLTESTS = assert1 diskrun1 runstate1
 
 .PHONY: alltests
 alltests: $(ALLTESTS)
-	for test in $(ALLTESTS) ;  do  ./$$test;  done
+	result=0; for test in $(ALLTESTS);  do ./$$test; result=$$(($$result+$$?));  done; exit $$result
 
 libsort.a: $(SORTOBJS) 
 	$(AR) -rv $@ $^
