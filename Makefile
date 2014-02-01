@@ -5,7 +5,7 @@ CXXFLAGS = -std=c++0x -g -pthread
 SORTOBJS = sorter.o sorterimpl.o diskrun.o
 LINKFLAGS = -L. -lsort -lpthread
 
-ALLTESTS = inmemory1 assert1 diskrun1
+ALLTESTS = assert1 diskrun1 runstate1
 
 .PHONY: alltests
 alltests: $(ALLTESTS)
@@ -29,11 +29,6 @@ GTEST_INC = -I$(GTEST_DIR)/include
 GTEST_CXXFLAGS = $(CXXFLAGS) $(GTEST_INC) -c
 GTEST_LINKFLAGS = $(LINKFLAGS) -L$(GTEST_DIR)/build -lgtest_main -lgtest
 
-inmemory1: inmemory1.o libsort.a
-	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
-inmemory1.o: inmemory1.cpp sorter.h
-	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 
-
 assert1: assert1.o libsort.a
 	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
 assert1.o: assert1.cpp sortassert.h
@@ -42,4 +37,15 @@ assert1.o: assert1.cpp sortassert.h
 diskrun1: diskrun1.o libsort.a
 	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
 diskrun1.o: diskrun1.cpp diskrun.h
+	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 
+
+runstate1: runstate1.o libsort.a
+	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
+runstate1.o: runstate1.cpp sorter.h
+	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 
+
+# Not currently made
+inmemory1: inmemory1.o libsort.a
+	$(CXX) $^ $(GTEST_LINKFLAGS) -o $@
+inmemory1.o: inmemory1.cpp sorter.h
 	$(CXX) $(GTEST_CXXFLAGS) -o $@ $< 

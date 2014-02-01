@@ -1,6 +1,7 @@
 assert1
 diskrun1
 inmemory1
+runstate1
 *.o
 *.a
 *~
