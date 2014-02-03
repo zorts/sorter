@@ -21,7 +21,7 @@ namespace external_sort {
   DiskRun::DiskRun()
     : _fd(-1)
     , _maxRecordSize(0)
-    , _writing(true)
+    , _isWritable(true)
   {
     _writeVector[0].iov_base = &_header;
     _writeVector[0].iov_len = sizeof(_header);
@@ -83,8 +83,8 @@ namespace external_sort {
 
   void DiskRun::resetForRead()
   {
-    SORT_ASSERT(_writing);
-    _writing = false;
+    SORT_ASSERT(_isWritable);
+    _isWritable = false;
     off_t where = ::lseek(_fd, 0, SEEK_SET);
     // TBD: real exception
     SORT_ASSERT(((off_t)0) == where);
@@ -98,7 +98,7 @@ namespace external_sort {
 
   bool DiskRun::next()
   {
-    SORT_ASSERT_DEBUGONLY(!_writing);
+    SORT_ASSERT_DEBUGONLY(!_isWritable);
     ssize_t amountRead = read(_fd, &_header, sizeof(Header));
     if (amountRead == sizeof(Header))
     {
@@ -120,16 +120,32 @@ namespace external_sort {
 
   DiskRun::Item DiskRun::getKey() const
   {
-    SORT_ASSERT_DEBUGONLY(!_writing);
+    SORT_ASSERT_DEBUGONLY(!_isWritable);
     SORT_ASSERT_DEBUGONLY(_fd != -1);
     return Item(_buffer.get(), _header._keyLength);
   }
 
   DiskRun::Item DiskRun::getPayload() const
   {
-    SORT_ASSERT_DEBUGONLY(!_writing);
+    SORT_ASSERT_DEBUGONLY(!_isWritable);
     SORT_ASSERT_DEBUGONLY(_fd != -1);
     return Item(_buffer.get()+_header._keyLength, _header._keyPlusPayloadLength - _header._keyLength);
   }
+
+  void DiskRun::copyCurrentFrom(const DiskRun& source)
+  {
+    SORT_ASSERT_DEBUGONLY(!source._isWritable);
+    SORT_ASSERT_DEBUGONLY(source._fd != -1);
+    SORT_ASSERT_DEBUGONLY(_isWritable);
+    SORT_ASSERT_DEBUGONLY(_fd != -1);
+    _writeVector[1].iov_base = const_cast<Header*>(&source._header);
+    _writeVector[1].iov_len = (size_t) sizeof(Header);
+    _writeVector[2].iov_base = const_cast<char*>(source._buffer.get());
+    _writeVector[2].iov_len = (size_t) sizeof(source._header._keyPlusPayloadLength);
+    ssize_t written = ::writev(_fd, &_writeVector[1], 2);
+    // TBD: real exceptions
+    SORT_ASSERT(written == (ssize_t) source._header._keyPlusPayloadLength + sizeof(Header));
+  }
+
 
 } // namespace external_sort

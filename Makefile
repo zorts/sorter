@@ -2,7 +2,7 @@
 # for the detailed license.
 
 CXXFLAGS = -std=c++0x -g -pthread
-SORTOBJS = sorter.o sorterimpl.o diskrun.o
+SORTOBJS = sorter.o sorterimpl.o diskrun.o merger.o
 LINKFLAGS = -L. -lsort -lpthread
 
 ALLTESTS = assert1 diskrun1 runstate1
@@ -17,6 +17,7 @@ libsort.a: $(SORTOBJS)
 sorter.o: sorter.h sorterimpl.h
 sorterimpl.o: sorter.h sorterimpl.h runstate.h
 diskrun.o: diskrun.h sortassert.h
+merger.o: merger.h diskrun.h sorter.h sortassert.h
 
 clean:
 	@rm -f *.o $(ALLTESTS) *.a timingrunsort

@@ -21,12 +21,21 @@ namespace external_sort {
                                   unsigned int keyBytes,
                                   unsigned int payloadBytes);
 
+    bool isWritable() const
+    {
+      return _isWritable;
+    }
+
     void write(const void* key, unsigned int keyLength,
                const void* payload, unsigned int payloadLength);
 
     void resetForRead();
 
     struct Item {
+      Item()
+        : _data(0)
+        , _length(0) {}
+
       Item(const void* data, unsigned int length)
         : _data(data)
         , _length(length) {}
@@ -39,6 +48,7 @@ namespace external_sort {
     bool next();
     Item getKey() const;
     Item getPayload() const;
+    void copyCurrentFrom(const DiskRun& source);
   private:
     DiskRun();
     // Prohibit copy/assign; do not implement
@@ -57,7 +67,7 @@ namespace external_sort {
     Header _header;
     int _fd;
     unsigned int _maxRecordSize;
-    bool _writing;
+    bool _isWritable;
 
     void close();
 
